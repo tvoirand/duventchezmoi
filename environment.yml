@@ -1,0 +1,5 @@
+name: duventchezmoi
+dependencies:
+  - pygrib
+  - numpy
+  - matplotlib
