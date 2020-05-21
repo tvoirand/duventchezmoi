@@ -24,7 +24,8 @@ def write_report(data, file_name):
     Input:
         -data       [dict, ...]
             contains for each row:
-            {"date_str": str, "date_obj": datetime object, "wind_speed": float}
+            {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
+        -file_name  str
     """
     print("not implemented yet")
 
@@ -68,7 +69,7 @@ def duventchezmoi(config_path):
     lon = float(config["main"]["lon"])
     threshold = float(config["main"]["threshold"])
     data_path = config["main"]["data_path"]
-    email = config["main"]["email"]
+    email_address = config["main"]["email"]
     cleaning = config["main"]["cleaning"].lower() in ["true"]
 
     # create extent on 0.25 deg grid around given coordinates
@@ -80,7 +81,8 @@ def duventchezmoi(config_path):
     ]
 
     # creating download directory
-    todays_data_path = os.path.join(data_path, datetime.datetime.now().strftime("%Y%m%d"))
+    today_str = datetime.datetime.now().strftime("%Y%m%d")
+    todays_data_path = os.path.join(data_path, today_str)
     if not os.path.exists(todays_data_path):
         os.makedirs(todays_data_path)
 
@@ -90,25 +92,38 @@ def duventchezmoi(config_path):
     except:
         sys.exit("Error in GFS data download")
 
-    # perform daily average of gfs data
-    data_rows = []
+    # loop through all hourly forecast gfs files
+    data = [] # initiate list to store results for each forecast
+    is_alert_triggered = False # initiate boolean to trigger alerts
     for file in os.listdir(todays_data_path):
-        data_rows.append(
+
+        # compute mean wind speed
+        wind_speed = compute_mean_wind_speed(os.path.join(todays_data_path, file))
+
+        # compare value to threshold
+        is_threshold_surpassed = wind_speed > threshold
+        if is_threshold_surpassed: # trigger alert
+            is_alert_triggered = True
+
+        # store results in list
+        data.append(
             {
                 "date_str": os.path.splitext(file)[0],
                 "date_obj": datetime.datetime.strptime(os.path.splitext(file)[0], "%Y%m%d_%H%M"),
-                "wind_speed": compute_mean_wind_speed(os.path.join(todays_data_path, file)),
+                "wind_speed": wind_speed,
+                "alert": is_threshold_surpassed
             }
         )
 
-    # compare results to threshold
-    for row in data_rows:
-        if row["wind_speed"] > threshold: # trigger alert
+    # if alert triggered
+    if is_alert_triggered:
 
-            # write report
-            print("write report")
-            # send email
+        # write report
+        report_filename = os.path.join(data_path, "{}.pdf".format(today_str))
+        write_report(data, report_filename)
 
+        # send email
+        send_email(email_address, report_filename)
 
     # clear data path
     if cleaning:
