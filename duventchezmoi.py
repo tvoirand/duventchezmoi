@@ -13,12 +13,26 @@ import datetime
 # third party packages
 import pygrib
 import numpy as np
+import matplotlib.pyplot as plt
 
 # local modules
 from download_gfs import download_gfs
 
 
-def write_report(data, file_name):
+def send_report(recipient, sender, password, report_file):
+    """
+    Send report via email.
+    Input:
+        -recipient          str
+        -sender             str
+        -password           str
+        -report_file        str
+    """
+
+    print("not implemented yet")
+
+
+def write_report(data, file_name, threshold):
     """
     Write alert report displaying wind speed values.
     Input:
@@ -26,8 +40,31 @@ def write_report(data, file_name):
             contains for each row:
             {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
         -file_name  str
+        -threshold  float
     """
-    print("not implemented yet")
+
+    # preparing data
+    dates = [row["date_obj"] for row in data]
+    values = [row["wind_speed"] for row in data]
+    points_color = []
+    for row in data:
+        if row["alert"]:
+            points_color.append("red")
+        else:
+            points_color.append("black")
+
+    # creating figure
+    fig = plt.figure()
+    plt.scatter(dates, values, c=points_color, marker="+") # plotting values
+    plt.plot(dates, [threshold for i in data], c="black", linewidth=0.5) # plotting threshold
+
+    # adding labels
+    plt.xlabel("Dates")
+    plt.ylabel("Wind speed (m/s)")
+    plt.title("Mean surface wind speed forecast from GFS")
+
+    # saving file
+    plt.savefig(file_name, format="pdf")
 
 def compute_mean_wind_speed(grib2_file):
     """
@@ -69,7 +106,9 @@ def duventchezmoi(config_path):
     lon = float(config["main"]["lon"])
     threshold = float(config["main"]["threshold"])
     data_path = config["main"]["data_path"]
-    email_address = config["main"]["email"]
+    recipient = config["main"]["recipient"]
+    sender = config["main"]["sender"]
+    password = config["main"]["password"]
     cleaning = config["main"]["cleaning"].lower() in ["true"]
 
     # create extent on 0.25 deg grid around given coordinates
@@ -86,11 +125,11 @@ def duventchezmoi(config_path):
     if not os.path.exists(todays_data_path):
         os.makedirs(todays_data_path)
 
-    # download gfs data
-    try:
-        download_gfs(extent, todays_data_path)
-    except:
-        sys.exit("Error in GFS data download")
+    # # download gfs data
+    # try:
+    #     download_gfs(extent, todays_data_path)
+    # except:
+    #     sys.exit("Error in GFS data download")
 
     # loop through all hourly forecast gfs files
     data = [] # initiate list to store results for each forecast
@@ -120,10 +159,10 @@ def duventchezmoi(config_path):
 
         # write report
         report_filename = os.path.join(data_path, "{}.pdf".format(today_str))
-        write_report(data, report_filename)
+        write_report(data, report_filename, threshold)
 
-        # send email
-        send_email(email_address, report_filename)
+        # send report via email
+        send_report(recipient, sender, password, report_filename)
 
     # clear data path
     if cleaning:
