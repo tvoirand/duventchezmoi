@@ -17,9 +17,10 @@ import matplotlib.pyplot as plt
 
 # local modules
 from download_gfs import download_gfs
+from send_mail import send_mail
 
 
-def send_report(recipient, sender, password, report_file):
+def send_report(recipient, sender, password, report_file, smtp_server, smtp_port):
     """
     Send report via email.
     Input:
@@ -29,7 +30,21 @@ def send_report(recipient, sender, password, report_file):
         -report_file        str
     """
 
-    print("not implemented yet")
+    subject = "Wind speed alert from Duventchezmoi"
+    contents = "Wind speed alert from Duventchezmoi.\nSee report in attachment."
+
+    send_mail(
+        sender,
+        password,
+        recipient,
+        [], # cc
+        [], # bcc
+        subject,
+        contents,
+        [report_file],
+        smtp_server,
+        smtp_port,
+    )
 
 
 def write_report(data, file_name, threshold):
@@ -106,10 +121,12 @@ def duventchezmoi(config_path):
     lon = float(config["main"]["lon"])
     threshold = float(config["main"]["threshold"])
     data_path = config["main"]["data_path"]
-    recipient = config["main"]["recipient"]
-    sender = config["main"]["sender"]
-    password = config["main"]["password"]
     cleaning = config["main"]["cleaning"].lower() in ["true"]
+    recipient = config["mail"]["recipient"]
+    sender = config["mail"]["sender"]
+    password = config["mail"]["password"]
+    smtp_server = config["mail"]["smtp_server"]
+    smtp_port = int(config["mail"]["smtp_port"])
 
     # create extent on 0.25 deg grid around given coordinates
     extent = [
@@ -162,7 +179,7 @@ def duventchezmoi(config_path):
         write_report(data, report_filename, threshold)
 
         # send report via email
-        send_report(recipient, sender, password, report_filename)
+        send_report(recipient, sender, password, report_filename, smtp_server, smtp_port)
 
     # clear data path
     if cleaning:
