@@ -88,7 +88,7 @@ def download_gfs(extent, data_path):
     run_date_obj = datetime.datetime.strptime(run_date_str, "%Y%m%d")
 
     # GFS performs 16 days forecast
-    GFS_max_forecast_hours = 3#72#384
+    GFS_max_forecast_hours = 72 #384 for some reason cannot download full forecast
 
     for forecast_hours in range(GFS_max_forecast_hours + 1):
 

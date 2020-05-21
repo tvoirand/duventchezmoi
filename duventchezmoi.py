@@ -142,11 +142,11 @@ def duventchezmoi(config_path):
     if not os.path.exists(todays_data_path):
         os.makedirs(todays_data_path)
 
-    # # download gfs data
-    # try:
-    #     download_gfs(extent, todays_data_path)
-    # except:
-    #     sys.exit("Error in GFS data download")
+    # download gfs data
+    try:
+        download_gfs(extent, todays_data_path)
+    except:
+        sys.exit("Error in GFS data download")
 
     # loop through all hourly forecast gfs files
     data = [] # initiate list to store results for each forecast
