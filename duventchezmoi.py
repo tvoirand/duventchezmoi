@@ -10,8 +10,38 @@ import configparser
 import math
 import datetime
 
+# third party packages
+import pygrib
+import numpy as np
+
 # local modules
 from download_gfs import download_gfs
+
+
+def compute_mean_wind_speed(grib2_file):
+    """
+    Compute mean wind speed from GFS products.
+    Input:
+        -grib2_file     str
+    Output:
+        -               float
+    """
+
+    # open grib2 file
+    grbs = pygrib.open(grib2_file)
+
+    # fetch datasets
+    u_grb = grbs.select(name="U component of wind")[0]
+    v_grb = grbs.select(name="V component of wind")[0]
+
+    # compute areal mean of U and V velocity
+    u_vel = np.mean(u_grb.values)
+    v_vel = np.mean(v_grb.values)
+
+    # compute mean wind speed
+    mean_wind_speed = np.sqrt(u_vel**2 + v_vel**2)
+
+    return mean_wind_speed
 
 
 def duventchezmoi(config_path):
@@ -52,7 +82,8 @@ def duventchezmoi(config_path):
     except:
         sys.exit("Error in GFS data download")
 
-    # performe daily average of gfs data
+    # perform daily average of gfs data
+
 
     # compare results to threshold
 
