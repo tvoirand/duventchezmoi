@@ -32,3 +32,19 @@ __pycache__/
 
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
+
+
+
+#--------------------------------------------------------------------
+# MacOS
+
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
