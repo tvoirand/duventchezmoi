@@ -18,6 +18,16 @@ import numpy as np
 from download_gfs import download_gfs
 
 
+def write_report(data, file_name):
+    """
+    Write alert report displaying wind speed values.
+    Input:
+        -data       [dict, ...]
+            contains for each row:
+            {"date_str": str, "date_obj": datetime object, "wind_speed": float}
+    """
+    print("not implemented yet")
+
 def compute_mean_wind_speed(grib2_file):
     """
     Compute mean wind speed from GFS products.
@@ -39,7 +49,7 @@ def compute_mean_wind_speed(grib2_file):
     v_vel = np.mean(v_grb.values)
 
     # compute mean wind speed
-    mean_wind_speed = np.sqrt(u_vel**2 + v_vel**2)
+    mean_wind_speed = np.sqrt(u_vel ** 2 + v_vel ** 2)
 
     return mean_wind_speed
 
@@ -70,9 +80,7 @@ def duventchezmoi(config_path):
     ]
 
     # creating download directory
-    todays_data_path = os.path.join(
-        data_path, datetime.datetime.now().strftime("%Y%m%d")
-    )
+    todays_data_path = os.path.join(data_path, datetime.datetime.now().strftime("%Y%m%d"))
     if not os.path.exists(todays_data_path):
         os.makedirs(todays_data_path)
 
@@ -83,24 +91,29 @@ def duventchezmoi(config_path):
         sys.exit("Error in GFS data download")
 
     # perform daily average of gfs data
-
+    data_rows = []
+    for file in os.listdir(todays_data_path):
+        data_rows.append(
+            {
+                "date_str": os.path.splitext(file)[0],
+                "date_obj": datetime.datetime.strptime(os.path.splitext(file)[0], "%Y%m%d_%H%M"),
+                "wind_speed": compute_mean_wind_speed(os.path.join(todays_data_path, file)),
+            }
+        )
 
     # compare results to threshold
+    for row in data_rows:
+        if row["wind_speed"] > threshold: # trigger alert
+
+            # write report
+            print("write report")
+            # send email
+
 
     # clear data path
     if cleaning:
-        for d in [
-            di
-            for di in os.listdir(data_path)
-            if os.path.isdir(os.path.join(data_path, di))
-        ]:
+        for d in [di for di in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, di))]:
             shutil.rmtree(os.path.join(data_path, di))
-
-    # if alert triggered
-
-    # write report
-
-    # send email
 
 
 if __name__ == "__main__":
