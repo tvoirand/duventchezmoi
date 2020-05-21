@@ -3,6 +3,7 @@ Duventchezmoi main script.
 """
 
 import os
+import configparser
 
 def duventchezmoi(config_path):
     """
@@ -11,7 +12,17 @@ def duventchezmoi(config_path):
         -config_path    str
     """
 
+    # read config
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    lat = float(config["main"]["lat"])
+    lon = float(config["main"]["lon"])
+    threshold = float(config["main"]["threshold"])
+    data_path = config["main"]["data_path"]
+    email = config["main"]["email"]
+
     # download gfs data
+    
 
     # performe daily average of gfs data
 
