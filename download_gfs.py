@@ -1,5 +1,5 @@
 """
-GFS data downloading module.
+GFS data downloading module for Duventchezmoi.
 """
 
 import os
