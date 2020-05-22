@@ -16,8 +16,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # local modules
-from download_gfs import download_gfs
-from send_mail import send_mail
+from modules.download_gfs import download_gfs
+from modules.send_mail import send_mail
 
 
 def send_report(recipient, sender, password, report_file, smtp_server, smtp_port):
