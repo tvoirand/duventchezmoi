@@ -37,8 +37,8 @@ def send_report(recipient, sender, password, report_file, smtp_server, smtp_port
         sender,
         password,
         recipient,
-        [], # cc
-        [], # bcc
+        [],  # cc
+        [],  # bcc
         subject,
         contents,
         [report_file],
@@ -70,8 +70,10 @@ def write_report(data, file_name, threshold):
 
     # creating figure
     fig = plt.figure()
-    plt.scatter(dates, values, c=points_color, marker="+") # plotting values
-    plt.plot(dates, [threshold for i in data], c="black", linewidth=0.5) # plotting threshold
+    plt.scatter(dates, values, c=points_color, marker="+")  # plotting values
+    plt.plot(
+        dates, [threshold for i in data], c="black", linewidth=0.5
+    )  # plotting threshold
 
     # adding labels
     plt.xlabel("Dates")
@@ -80,6 +82,7 @@ def write_report(data, file_name, threshold):
 
     # saving file
     plt.savefig(file_name, format="pdf")
+
 
 def compute_mean_wind_speed(grib2_file):
     """
@@ -149,8 +152,8 @@ def duventchezmoi(config_path):
         sys.exit("Error in GFS data download")
 
     # loop through all hourly forecast gfs files
-    data = [] # initiate list to store results for each forecast
-    is_alert_triggered = False # initiate boolean to trigger alerts
+    data = []  # initiate list to store results for each forecast
+    is_alert_triggered = False  # initiate boolean to trigger alerts
     for file in os.listdir(todays_data_path):
 
         # compute mean wind speed
@@ -158,16 +161,18 @@ def duventchezmoi(config_path):
 
         # compare value to threshold
         is_threshold_surpassed = wind_speed > threshold
-        if is_threshold_surpassed: # trigger alert
+        if is_threshold_surpassed:  # trigger alert
             is_alert_triggered = True
 
         # store results in list
         data.append(
             {
                 "date_str": os.path.splitext(file)[0],
-                "date_obj": datetime.datetime.strptime(os.path.splitext(file)[0], "%Y%m%d_%H%M"),
+                "date_obj": datetime.datetime.strptime(
+                    os.path.splitext(file)[0], "%Y%m%d_%H%M"
+                ),
                 "wind_speed": wind_speed,
-                "alert": is_threshold_surpassed
+                "alert": is_threshold_surpassed,
             }
         )
 
@@ -179,11 +184,17 @@ def duventchezmoi(config_path):
         write_report(data, report_filename, threshold)
 
         # send report via email
-        send_report(recipient, sender, password, report_filename, smtp_server, smtp_port)
+        send_report(
+            recipient, sender, password, report_filename, smtp_server, smtp_port
+        )
 
     # clear data path
     if cleaning:
-        for d in [di for di in os.listdir(data_path) if os.path.isdir(os.path.join(data_path, di))]:
+        for d in [
+            di
+            for di in os.listdir(data_path)
+            if os.path.isdir(os.path.join(data_path, di))
+        ]:
             shutil.rmtree(os.path.join(data_path, di))
 
 

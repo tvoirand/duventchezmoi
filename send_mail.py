@@ -10,6 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 
+
 def total_size(files_list):
     """
     Get total size of given list of files.
@@ -20,6 +21,7 @@ def total_size(files_list):
     for file in files_list:
         size += os.path.getsize(file)
     return size
+
 
 def send_mail(
     sender,
@@ -61,15 +63,17 @@ def send_mail(
 
     # handle attachment
     attachment_size = total_size(attachments)
-    if attachment_size > 10000000: # case of oversize attachment
+    if attachment_size > 10000000:  # case of oversize attachment
         contents += "\nOversized attachment."
     else:
         for file in attachments:
             attachment_filename = os.path.basename(file)
-            piece = open(file, "rb") # opening report file
-            part = MIMEBase("application", "octet-stream") # encoding attachment in Base64
-            part.set_payload((piece).read()) # reading report file in attachment
-            encoders.encode_base64(part) # encoding attachment in Base64
+            piece = open(file, "rb")  # opening report file
+            part = MIMEBase(
+                "application", "octet-stream"
+            )  # encoding attachment in Base64
+            part.set_payload((piece).read())  # reading report file in attachment
+            encoders.encode_base64(part)  # encoding attachment in Base64
             part.add_header(
                 "Content-Disposition", "piece; filename= {}".format(attachment_filename)
             )
