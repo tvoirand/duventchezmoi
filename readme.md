@@ -7,7 +7,7 @@ Sends a report by email in case the forecast surpasses a given threshold.
 
 ## Dependencies
 
-*   Python packages (listed in environment.yml):
+*   Python packages (listed in `environment.yml`):
 
     *   pygrib
     *   numpy
@@ -17,8 +17,8 @@ Sends a report by email in case the forecast surpasses a given threshold.
 
 ## Installation
 
-*   Create the necessary environment using `conda env create -f environment.yml`
+*   Create the necessary environment using for example `conda env create -f environment.yml`
 
-*   Create a custom config file name `config/config.ini` based on the example given in `config/example_config.ini`
+*   Create a custom config file named `config/config.ini` based on the example given in `config/example_config.ini`
 
-*   Write a crontab to run `duventchezmoi.py` periodically using the corresponding environment
+*   Write a crontab to run `python duventchezmoi.py` periodically using the corresponding environment
