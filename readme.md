@@ -7,7 +7,7 @@ Sends a report by email in case the forecast surpasses a given threshold.
 
 ## Dependencies
 
-*   Python packages (listed in `environment.yml`):
+*   Requires Python 3 with the following packages (listed in `environment.yml`):
 
     *   pygrib
     *   numpy
