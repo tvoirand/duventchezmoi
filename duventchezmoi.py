@@ -32,6 +32,7 @@ def send_report(
     lat,
     lon,
     threshold,
+    units
 ):
     """
     Send report via email.
@@ -45,6 +46,7 @@ def send_report(
         -lat                float
         -lon                float
         -threshold          float
+        -units              str
     """
 
     subject = "Wind speed alert from Duventchezmoi"
@@ -55,7 +57,7 @@ def send_report(
     contents += "Latitude, longitude (decimal degrees): {:5.2f}, {:5.2f}\n".format(
         lat, lon
     )
-    contents += "Threshold (m/s): {:5.2f}\n\n".format(threshold)
+    contents += "Threshold ({}): {:5.2f}\n\n".format(units, threshold)
     contents += "Wind speed forecast from the GFS model in the next 16 days "
     contents += "showed values higher than the given threshold over the monitoring coordinates.\n"
     contents += "See the report in attachment for more details.\n\n"
@@ -75,7 +77,7 @@ def send_report(
     )
 
 
-def write_report(data, file_name, threshold):
+def write_report(data, file_name, threshold, units):
     """
     Write alert report displaying wind speed values.
     Input:
@@ -84,6 +86,7 @@ def write_report(data, file_name, threshold):
             {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
         -file_name  str
         -threshold  float
+        -units      str
     """
 
     # preparing data
@@ -109,7 +112,7 @@ def write_report(data, file_name, threshold):
 
     # adding labels
     plt.xlabel("Dates")
-    plt.ylabel("Wind speed (m/s)")
+    plt.ylabel("Wind speed ({})".format(units))
     plt.title("Mean surface wind speed forecast from GFS")
 
     # add legend
@@ -145,11 +148,13 @@ def write_report(data, file_name, threshold):
     plt.savefig(file_name, format="pdf")
 
 
-def compute_mean_wind_speed(grib2_file):
+def compute_mean_wind_speed(grib2_file, units):
     """
     Compute mean wind speed from GFS products.
     Input:
         -grib2_file     str
+        -units          str
+            either m/s or km/h
     Output:
         -               float
     """
@@ -167,6 +172,10 @@ def compute_mean_wind_speed(grib2_file):
 
     # compute mean wind speed
     mean_wind_speed = np.sqrt(u_vel ** 2 + v_vel ** 2)
+
+    # units conversion
+    if units.lower() == "km/h":
+        mean_wind_speed *= 3.6
 
     return mean_wind_speed
 
@@ -186,6 +195,7 @@ def duventchezmoi(config_path):
     threshold = float(config["main"]["threshold"])
     data_path = config["main"]["data_path"]
     cleaning = config["main"]["cleaning"].lower() in ["true"]
+    units = config["main"]["units"]
     recipient = config["mail"]["recipient"]
     sender = config["mail"]["sender"]
     password = config["mail"]["password"]
@@ -218,7 +228,7 @@ def duventchezmoi(config_path):
     for file in os.listdir(todays_data_path):
 
         # compute mean wind speed
-        wind_speed = compute_mean_wind_speed(os.path.join(todays_data_path, file))
+        wind_speed = compute_mean_wind_speed(os.path.join(todays_data_path, file), units)
 
         # compare value to threshold
         is_threshold_surpassed = wind_speed > threshold
@@ -242,7 +252,7 @@ def duventchezmoi(config_path):
 
         # write report
         report_filename = os.path.join(data_path, "{}.pdf".format(today_str))
-        write_report(data, report_filename, threshold)
+        write_report(data, report_filename, threshold, units)
 
         # send report via email
         send_report(
@@ -255,6 +265,7 @@ def duventchezmoi(config_path):
             lat,
             lon,
             threshold,
+            units
         )
 
     # clear data path
