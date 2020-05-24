@@ -14,13 +14,25 @@ import datetime
 import pygrib
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+import matplotlib.dates as mdates
 
 # local modules
 from modules.download_gfs import download_gfs
 from modules.send_mail import send_mail
 
 
-def send_report(recipient, sender, password, report_file, smtp_server, smtp_port):
+def send_report(
+    recipient,
+    sender,
+    password,
+    report_file,
+    smtp_server,
+    smtp_port,
+    lat,
+    lon,
+    threshold,
+):
     """
     Send report via email.
     Input:
@@ -28,10 +40,26 @@ def send_report(recipient, sender, password, report_file, smtp_server, smtp_port
         -sender             str
         -password           str
         -report_file        str
+        -smtp_server        str
+        -smtp_port          str
+        -lat                float
+        -lon                float
+        -threshold          float
     """
 
     subject = "Wind speed alert from Duventchezmoi"
-    contents = "Wind speed alert from Duventchezmoi.\nSee report in attachment."
+
+    contents = ""
+    contents += "Hi,\n\n"
+    contents += "An alert was triggered for the following monitoring configuration:\n"
+    contents += "Latitude, longitude (decimal degrees): {:5.2f}, {:5.2f}\n".format(
+        lat, lon
+    )
+    contents += "Threshold (m/s): {:5.2f}\n\n".format(threshold)
+    contents += "Wind speed forecast from the GFS model in the next 16 days "
+    contents += "showed values higher than the given threshold over the monitoring coordinates.\n"
+    contents += "See the report in attachment for more details.\n\n"
+    contents += "This is an automatic email sent by the Duventchezmoi application."
 
     send_mail(
         sender,
@@ -69,16 +97,49 @@ def write_report(data, file_name, threshold):
             points_color.append("black")
 
     # creating figure
-    fig = plt.figure()
+    fig = plt.figure(figsize=[8.8, 4.8])
     plt.scatter(dates, values, c=points_color, marker="+")  # plotting values
     plt.plot(
-        dates, [threshold for i in data], c="black", linewidth=0.5
+        dates, [threshold for i in data], c="black", linewidth=0.5,
     )  # plotting threshold
+
+    # format dates axis
+    plt.gca().xaxis.set_ticks([d for d in dates if d.hour == 0])
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
 
     # adding labels
     plt.xlabel("Dates")
     plt.ylabel("Wind speed (m/s)")
     plt.title("Mean surface wind speed forecast from GFS")
+
+    # add legend
+    black_legend = mlines.Line2D(
+        [],
+        [],
+        color="black",
+        marker="+",
+        linestyle="None",
+        label="GFS forecast below threshold",
+    )
+    red_legend = mlines.Line2D(
+        [],
+        [],
+        color="red",
+        marker="+",
+        linestyle="None",
+        label="GFS forecast above threshold",
+    )
+    threshold_legend = mlines.Line2D(
+        [], [], color="black", linewidth=0.5, label="Threshold"
+    )
+    plt.legend(
+        handles=[black_legend, red_legend, threshold_legend],
+        loc="upper left",
+        bbox_to_anchor=(1.0, 1.0),
+    )
+
+    # handle layout
+    plt.tight_layout()
 
     # saving file
     plt.savefig(file_name, format="pdf")
@@ -185,7 +246,15 @@ def duventchezmoi(config_path):
 
         # send report via email
         send_report(
-            recipient, sender, password, report_filename, smtp_server, smtp_port
+            recipient,
+            sender,
+            password,
+            report_filename,
+            smtp_server,
+            smtp_port,
+            lat,
+            lon,
+            threshold,
         )
 
     # clear data path
