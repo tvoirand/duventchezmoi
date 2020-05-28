@@ -166,12 +166,11 @@ def compute_mean_wind_speed(grib2_file, units):
     u_grb = grbs.select(name="U component of wind")[0]
     v_grb = grbs.select(name="V component of wind")[0]
 
-    # compute areal mean of U and V velocity
-    u_vel = np.mean(u_grb.values)
-    v_vel = np.mean(v_grb.values)
+    # compute wind speed from U and V velocities
+    wind_speed = np.sqrt(u_grb.values ** 2 + v_grb.values ** 2)
 
-    # compute mean wind speed
-    mean_wind_speed = np.sqrt(u_vel ** 2 + v_vel ** 2)
+    # compute areal mean
+    mean_wind_speed = np.mean(wind_speed)
 
     # units conversion
     if units.lower() == "km/h":
