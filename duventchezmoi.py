@@ -32,7 +32,7 @@ def send_report(
     lat,
     lon,
     threshold,
-    units
+    units,
 ):
     """
     Send report via email.
@@ -227,7 +227,9 @@ def duventchezmoi(config_path):
     for file in os.listdir(todays_data_path):
 
         # compute mean wind speed
-        wind_speed = compute_mean_wind_speed(os.path.join(todays_data_path, file), units)
+        wind_speed = compute_mean_wind_speed(
+            os.path.join(todays_data_path, file), units
+        )
 
         # compare value to threshold
         is_threshold_surpassed = wind_speed > threshold
@@ -264,7 +266,7 @@ def duventchezmoi(config_path):
             lat,
             lon,
             threshold,
-            units
+            units,
         )
 
     # clear data path

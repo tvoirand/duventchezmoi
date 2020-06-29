@@ -88,7 +88,7 @@ def download_gfs(extent, data_path):
     run_date_obj = datetime.datetime.strptime(run_date_str, "%Y%m%d")
 
     # GFS performs 16 days forecast
-    GFS_max_forecast_hours = 72  # 384 for some reason cannot download full forecast
+    GFS_max_forecast_hours = 120  # 384 for some reason cannot download full forecast
 
     for forecast_hours in range(GFS_max_forecast_hours + 1):
 
@@ -97,7 +97,7 @@ def download_gfs(extent, data_path):
         output_file = "{}.grib2".format(forecast_date.strftime("%Y%m%d_%H%S"))
 
         # create URL
-        url = create_gfs_url("20200517", extent, forecast_hours)
+        url = create_gfs_url(run_date_str, extent, forecast_hours)
 
         # download file
         download_from_url(url, os.path.join(data_path, output_file), verbose=True)
