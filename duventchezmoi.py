@@ -77,16 +77,17 @@ def send_report(
     )
 
 
-def write_report(data, file_name, threshold, units):
+def write_report(data, threshold, units, file_name=None):
     """
     Write alert report displaying wind speed values.
     Input:
         -data       [dict, ...]
             contains for each row:
             {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
-        -file_name  str
         -threshold  float
         -units      str
+        -file_name  str or None
+            if None, the plot will be displayed and not saved to a file
     """
 
     # preparing data
@@ -145,7 +146,10 @@ def write_report(data, file_name, threshold, units):
     plt.tight_layout()
 
     # saving file
-    plt.savefig(file_name, format="pdf")
+    if file_name is None:
+        plt.show()
+    else:
+        plt.savefig(file_name, format="pdf")
 
 
 def compute_mean_wind_speed(grib2_file, units):
@@ -253,7 +257,7 @@ def duventchezmoi(config_path):
 
         # write report
         report_filename = os.path.join(data_path, "{}.pdf".format(today_str))
-        write_report(data, report_filename, threshold, units)
+        write_report(data, threshold, units, report_filename)
 
         # send report via email
         send_report(
