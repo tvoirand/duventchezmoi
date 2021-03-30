@@ -43,6 +43,7 @@ def create_gfs_url(run_date, extent, forecast_hours):
     url += "&toplat={}".format(top_lat)
     url += "&bottomlat={}".format(bottom_lat)
     url += "&dir=%2Fgfs.{0}%2F{1}".format(run_date, step)
+    url += "%2Fatmos"
 
     return url
 
