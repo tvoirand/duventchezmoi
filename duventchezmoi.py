@@ -165,7 +165,7 @@ def compute_mean_wind_speed(grib2_file, units):
     """
 
     # open grib2 file
-    grbs = pygrib.open(grib2_file)
+    grbs = pygrib.open(str(grib2_file))
 
     # fetch datasets
     u_grb = grbs.select(name="U component of wind")[0]
