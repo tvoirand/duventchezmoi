@@ -12,6 +12,9 @@ Sends a report by email in case the forecast surpasses a given threshold.
     *   pygrib
     *   numpy
     *   matplotlib
+    *   google-api-python-client
+    *   google-auth
+    *   google-auth-oauthlib
 
 *   Email server which can be accessed automatically
 
