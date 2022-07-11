@@ -9,6 +9,7 @@ import shutil
 import configparser
 import math
 import datetime
+from pathlib import Path
 
 # third party packages
 import pygrib
@@ -19,16 +20,14 @@ import matplotlib.dates as mdates
 
 # local modules
 from modules.download_gfs import download_gfs
-from modules.send_mail import send_mail
+from modules.gmail_utils import authenticate_google_oauth2
+from modules.gmail_utils import send_mail
 
 
 def send_report(
-    recipient,
+    recipients,
     sender,
-    password,
     report_file,
-    smtp_server,
-    smtp_port,
     lat,
     lon,
     threshold,
@@ -37,12 +36,9 @@ def send_report(
     """
     Send report via email.
     Input:
-        -recipient          str
+        -recipients         [str, ...]
         -sender             str
-        -password           str
         -report_file        str
-        -smtp_server        str
-        -smtp_port          str
         -lat                float
         -lon                float
         -threshold          float
@@ -63,17 +59,19 @@ def send_report(
     contents += "See the report in attachment for more details.\n\n"
     contents += "This is an automatic email sent by the Duventchezmoi application."
 
+    project_path = Path(__file__).resolve().parent
+    credentials = authenticate_google_oauth2(
+        project_path / "config" / "gmail_credentials.json",
+        project_path / "config" / "gmail_token.json",
+    )
+
     send_mail(
-        sender,
-        password,
-        recipient,
-        [],  # cc
-        [],  # bcc
         subject,
         contents,
-        [report_file],
-        smtp_server,
-        smtp_port,
+        credentials,
+        sender,
+        recipients,
+        attachments=[Path(report_file)],
     )
 
 
@@ -199,11 +197,8 @@ def duventchezmoi(config_path):
     data_path = config["main"]["data_path"]
     cleaning = config["main"]["cleaning"].lower() in ["true"]
     units = config["main"]["units"]
-    recipient = config["mail"]["recipient"]
+    recipients = config["mail"]["recipients"].split(",")
     sender = config["mail"]["sender"]
-    password = config["mail"]["password"]
-    smtp_server = config["mail"]["smtp_server"]
-    smtp_port = int(config["mail"]["smtp_port"])
 
     # create extent on 0.25 deg grid around given coordinates
     extent = [
@@ -261,12 +256,9 @@ def duventchezmoi(config_path):
 
         # send report via email
         send_report(
-            recipient,
+            recipients,
             sender,
-            password,
             report_filename,
-            smtp_server,
-            smtp_port,
             lat,
             lon,
             threshold,

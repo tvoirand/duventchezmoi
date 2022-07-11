@@ -2,6 +2,8 @@
 # Specific to Duventchezmoi
 
 config/config.ini
+config/gmail_credentials.json
+config/gmail_token.json
 data/*
 
 

@@ -1,8 +1,11 @@
 name: duventchezmoi
-channels:
-  - conda-forge
 dependencies:
   - python=3.6
   - pygrib
   - numpy
   - matplotlib
+  - pip
+  - pip:
+    - google-api-python-client
+    - google-auth
+    - google-auth-oauthlib
