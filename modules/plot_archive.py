@@ -4,6 +4,7 @@ Script to plot duventchezmoi data archive.
 
 # standard imports
 import os
+from pathlib import Path
 import argparse
 import configparser
 import datetime
@@ -17,16 +18,16 @@ def plot_archive(report_filename=None):
     """
     Plot duventchezmoi data archive.
     Input:
-        -report_filename    str or None
+        -report_filename    Path or None
             if None, the plot will be displayed and not saved to a file
     """
 
     # get project path
-    duventchezmoi_path = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    project_path = Path(__file__).resolve().parents[1]
 
     # read config
     config = configparser.ConfigParser()
-    config.read(os.path.join(duventchezmoi_path, "config", "config.ini"))
+    config.read(project_path / "config" / "config.ini")
     threshold = float(config["main"]["threshold"])
     data_path = config["main"]["data_path"]
     units = config["main"]["units"]
@@ -35,18 +36,10 @@ def plot_archive(report_filename=None):
     data = []
 
     # loop through dates
-    for date_path in [
-        os.path.join(data_path, d)
-        for d in os.listdir(data_path)
-        if os.path.isdir(os.path.join(data_path, d))
-    ]:
+    for date_path in [d for d in data_path.iterdir() if d.is_dir()]:
 
         # loop through hourly grib files
-        for grib_file_path in [
-            os.path.join(date_path, f)
-            for f in os.listdir(date_path)
-            if f.endswith(".grib2")
-        ]:
+        for grib_file_path in [f for f in date_path.iterdir() if f.name.endswith(".grib2")]:
 
             # compute wind speed
             wind_speed = compute_mean_wind_speed(grib_file_path, units)
@@ -59,9 +52,9 @@ def plot_archive(report_filename=None):
             # add item in data array
             data.append(
                 {
-                    "date_str": os.path.splitext(os.path.basename(grib_file_path))[0],
+                    "date_str": grib_file_path.stem,
                     "date_obj": datetime.datetime.strptime(
-                        os.path.splitext(os.path.basename(grib_file_path))[0],
+                        grib_file_path.stem,
                         "%Y%m%d_%H%M",
                     ),
                     "wind_speed": wind_speed,

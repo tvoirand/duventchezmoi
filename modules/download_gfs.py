@@ -3,9 +3,9 @@ GFS data downloading module for Duventchezmoi.
 """
 
 # standard packages
-import os
 import urllib.request
 import datetime
+from pathlib import Path
 
 
 def create_gfs_url(run_date, extent, forecast_hours):
@@ -53,7 +53,7 @@ def download_from_url(input_url, output_file, verbose=False):
     Download from given url, and store responde in given output file.
     Input:
         -input_url      str
-        -output_file    str (full path)
+        -output_file    Path
         -verbose        boolean
     """
 
@@ -81,7 +81,7 @@ def download_gfs(extent, data_path):
     Input:
         -extent         [float, float, float, float]
             W, N, E, S, at 0.25 deg precision
-        -data_path      str
+        -data_path      Path
     """
 
     # get run date
@@ -101,12 +101,12 @@ def download_gfs(extent, data_path):
         url = create_gfs_url(run_date_str, extent, forecast_hours)
 
         # download file
-        download_from_url(url, os.path.join(data_path, output_file), verbose=True)
+        download_from_url(url, data_path / output_file, verbose=True)
 
 
 if __name__ == "__main__":
 
     extent = [-0.75, 45.0, -0.50, 44.75]
-    data_path = "/Users/thibautvoirand/creation/programmation/duventchezmoi/data"
+    data_path = Path("/Users/thibautvoirand/creation/programmation/duventchezmoi/data")
 
     download_gfs(extent, data_path)

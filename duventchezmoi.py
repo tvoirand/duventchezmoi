@@ -3,7 +3,6 @@ Duventchezmoi main script.
 """
 
 # standard packages
-import os
 import sys
 import shutil
 import configparser
@@ -38,7 +37,7 @@ def send_report(
     Input:
         -recipients         [str, ...]
         -sender             str
-        -report_file        str
+        -report_file        Path
         -lat                float
         -lon                float
         -threshold          float
@@ -50,9 +49,7 @@ def send_report(
     contents = ""
     contents += "Hi,\n\n"
     contents += "An alert was triggered for the following monitoring configuration:\n"
-    contents += "Latitude, longitude (decimal degrees): {:5.2f}, {:5.2f}\n".format(
-        lat, lon
-    )
+    contents += "Latitude, longitude (decimal degrees): {:5.2f}, {:5.2f}\n".format(lat, lon)
     contents += "Threshold ({}): {:5.2f}\n\n".format(units, threshold)
     contents += "Wind speed forecast from the GFS model in the next 16 days "
     contents += "showed values higher than the given threshold over the monitoring coordinates.\n"
@@ -71,7 +68,7 @@ def send_report(
         credentials,
         sender,
         recipients,
-        attachments=[Path(report_file)],
+        attachments=[report_file],
     )
 
 
@@ -84,7 +81,7 @@ def write_report(data, threshold, units, file_name=None):
             {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
         -threshold  float
         -units      str
-        -file_name  str or None
+        -file_name  Path or None
             if None, the plot will be displayed and not saved to a file
     """
 
@@ -102,7 +99,10 @@ def write_report(data, threshold, units, file_name=None):
     fig = plt.figure(figsize=[8.8, 4.8])
     plt.scatter(dates, values, c=points_color, marker="+")  # plotting values
     plt.plot(
-        dates, [threshold for i in data], c="black", linewidth=0.5,
+        dates,
+        [threshold for i in data],
+        c="black",
+        linewidth=0.5,
     )  # plotting threshold
 
     # format dates axis
@@ -131,9 +131,7 @@ def write_report(data, threshold, units, file_name=None):
         linestyle="None",
         label="GFS forecast above threshold",
     )
-    threshold_legend = mlines.Line2D(
-        [], [], color="black", linewidth=0.5, label="Threshold"
-    )
+    threshold_legend = mlines.Line2D([], [], color="black", linewidth=0.5, label="Threshold")
     plt.legend(
         handles=[black_legend, red_legend, threshold_legend],
         loc="upper left",
@@ -154,7 +152,7 @@ def compute_mean_wind_speed(grib2_file, units):
     """
     Compute mean wind speed from GFS products.
     Input:
-        -grib2_file     str
+        -grib2_file     Path
         -units          str
             either m/s or km/h
     Output:
@@ -169,7 +167,7 @@ def compute_mean_wind_speed(grib2_file, units):
     v_grb = grbs.select(name="V component of wind")[0]
 
     # compute wind speed from U and V velocities
-    wind_speed = np.sqrt(u_grb.values ** 2 + v_grb.values ** 2)
+    wind_speed = np.sqrt(u_grb.values**2 + v_grb.values**2)
 
     # compute areal mean
     mean_wind_speed = np.mean(wind_speed)
@@ -185,7 +183,7 @@ def duventchezmoi(config_path):
     """
     Duventchezmoi main function.
     Input:
-        -config_path    str
+        -config_path    Path
     """
 
     # read config
@@ -194,7 +192,7 @@ def duventchezmoi(config_path):
     lat = float(config["main"]["lat"])
     lon = float(config["main"]["lon"])
     threshold = float(config["main"]["threshold"])
-    data_path = config["main"]["data_path"]
+    data_path = Path(config["main"]["data_path"]).resolve()
     cleaning = config["main"]["cleaning"].lower() in ["true"]
     units = config["main"]["units"]
     recipients = config["mail"]["recipients"].split(",")
@@ -210,9 +208,9 @@ def duventchezmoi(config_path):
 
     # creating download directory
     today_str = datetime.datetime.now().strftime("%Y%m%d")
-    todays_data_path = os.path.join(data_path, today_str)
-    if not os.path.exists(todays_data_path):
-        os.makedirs(todays_data_path)
+    todays_data_path = data_path / today_str
+    if not todays_data_path.exists():
+        todays_data_path.mkdir(parents=True)
 
     # download gfs data
     try:
@@ -223,12 +221,10 @@ def duventchezmoi(config_path):
     # loop through all hourly forecast gfs files
     data = []  # initiate list to store results for each forecast
     is_alert_triggered = False  # initiate boolean to trigger alerts
-    for file in os.listdir(todays_data_path):
+    for f in todays_data_path.iterdir():
 
         # compute mean wind speed
-        wind_speed = compute_mean_wind_speed(
-            os.path.join(todays_data_path, file), units
-        )
+        wind_speed = compute_mean_wind_speed(f, units)
 
         # compare value to threshold
         is_threshold_surpassed = wind_speed > threshold
@@ -238,10 +234,8 @@ def duventchezmoi(config_path):
         # store results in list
         data.append(
             {
-                "date_str": os.path.splitext(file)[0],
-                "date_obj": datetime.datetime.strptime(
-                    os.path.splitext(file)[0], "%Y%m%d_%H%M"
-                ),
+                "date_str": f.stem,
+                "date_obj": datetime.datetime.strptime(f.stem, "%Y%m%d_%H%M"),
                 "wind_speed": wind_speed,
                 "alert": is_threshold_surpassed,
             }
@@ -251,7 +245,7 @@ def duventchezmoi(config_path):
     if is_alert_triggered:
 
         # write report
-        report_filename = os.path.join(data_path, "{}.pdf".format(today_str))
+        report_filename = data_path / "{}.pdf".format(today_str)
         write_report(data, threshold, units, report_filename)
 
         # send report via email
@@ -267,17 +261,13 @@ def duventchezmoi(config_path):
 
     # clear data path
     if cleaning:
-        for d in [
-            di
-            for di in os.listdir(data_path)
-            if os.path.isdir(os.path.join(data_path, di))
-        ]:
-            shutil.rmtree(os.path.join(data_path, di))
+        for d in [di for di in data_path.iterdir() if di.is_dir()]:
+            shutil.rmtree(d)
 
 
 if __name__ == "__main__":
 
-    duventchezmoi_path = os.path.dirname(os.path.realpath(__file__))
-    config_path = os.path.join(duventchezmoi_path, "config", "config.ini")
+    project_path = Path(__file__).resolve().parent
+    config_path = project_path / "config" / "config.ini"
 
     duventchezmoi(config_path)
