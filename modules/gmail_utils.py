@@ -22,8 +22,7 @@ SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
 
 def total_size(files_list):
-    """
-    Get total size of given list of files.
+    """Get total size of given list of files.
 
     Parameters
     ----------
@@ -71,8 +70,7 @@ def authenticate_google_oauth2(credentials_file, token_file):
 def send_mail(
     subject, contents, credentials, sender, recipients, cc=[], bcc=[], attachments=[], logger=None
 ):
-    """
-    Send email using Gmail API.
+    """Send email using Gmail API.
 
     Parameters
     ----------

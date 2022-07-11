@@ -15,11 +15,12 @@ from duventchezmoi import compute_mean_wind_speed
 
 
 def plot_archive(report_filename=None):
-    """
-    Plot duventchezmoi data archive.
-    Input:
-        -report_filename    Path or None
-            if None, the plot will be displayed and not saved to a file
+    """Plot duventchezmoi data archive.
+
+    Parameters
+    ----------
+    report_filename : Path or None
+        if None, the plot will be displayed and not saved to a file
     """
 
     # get project path

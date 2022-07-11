@@ -32,16 +32,17 @@ def send_report(
     threshold,
     units,
 ):
-    """
-    Send report via email.
-    Input:
-        -recipients         [str, ...]
-        -sender             str
-        -report_file        Path
-        -lat                float
-        -lon                float
-        -threshold          float
-        -units              str
+    """Send report via email.
+
+    Parameters
+    ----------
+    recipients : [str, ...]
+    sender : str
+    report_file : Path
+    lat : float
+    lon : float
+    threshold : float
+    units : str
     """
 
     subject = "Wind speed alert from Duventchezmoi"
@@ -73,16 +74,17 @@ def send_report(
 
 
 def write_report(data, threshold, units, file_name=None):
-    """
-    Write alert report displaying wind speed values.
-    Input:
-        -data       [dict, ...]
-            contains for each row:
-            {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
-        -threshold  float
-        -units      str
-        -file_name  Path or None
-            if None, the plot will be displayed and not saved to a file
+    """Write alert report displaying wind speed values.
+
+    Parameters
+    ----------
+    data : [dict, ...]
+        contains for each row:
+        {"date_str": str, "date_obj": datetime object, "wind_speed": float, "alert": bool}
+    threshold : float
+    units : str
+    file_name : Path or None
+        if None, the plot will be displayed and not saved to a file
     """
 
     # preparing data
@@ -149,14 +151,17 @@ def write_report(data, threshold, units, file_name=None):
 
 
 def compute_mean_wind_speed(grib2_file, units):
-    """
-    Compute mean wind speed from GFS products.
-    Input:
-        -grib2_file     Path
-        -units          str
-            either m/s or km/h
-    Output:
-        -               float
+    """Compute mean wind speed from GFS products.
+
+    Parameters
+    ----------
+    grib2_file : Path
+    units : str
+        either m/s or km/h
+
+    Returns
+    -------
+    float
     """
 
     # open grib2 file
@@ -180,10 +185,11 @@ def compute_mean_wind_speed(grib2_file, units):
 
 
 def duventchezmoi(config_path):
-    """
-    Duventchezmoi main function.
-    Input:
-        -config_path    Path
+    """Duventchezmoi main function.
+
+    Parameters
+    ----------
+    config_path : Path
     """
 
     # read config

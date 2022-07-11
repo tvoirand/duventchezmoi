@@ -9,12 +9,13 @@ from pathlib import Path
 
 
 def create_gfs_url(run_date, extent, forecast_hours):
-    """
-    Generates GFS data request.
-    Input:
-        -run_date           str (format YYYYmmdd)
-        -extent             [float, float, float, float] (W, N, E, S)
-        -forecast_hours     int
+    """Generates GFS data request.
+
+    Parameters
+    ----------
+    run_date : str (format YYYYmmdd)
+    extent : [float, float, float, float] (W, N, E, S)
+    forecast_hours : int
     """
 
     # preparing parameters
@@ -49,12 +50,13 @@ def create_gfs_url(run_date, extent, forecast_hours):
 
 
 def download_from_url(input_url, output_file, verbose=False):
-    """
-    Download from given url, and store responde in given output file.
-    Input:
-        -input_url      str
-        -output_file    Path
-        -verbose        boolean
+    """Download from given url, and store responde in given output file.
+
+    Parameters
+    ----------
+    input_url : str
+    output_file : Path
+    verbose : boolean
     """
 
     if verbose:
@@ -76,12 +78,13 @@ def download_from_url(input_url, output_file, verbose=False):
 
 
 def download_gfs(extent, data_path):
-    """
-    Download today's GFS forecast for given coordinates.
-    Input:
-        -extent         [float, float, float, float]
-            W, N, E, S, at 0.25 deg precision
-        -data_path      Path
+    """Download today's GFS forecast for given coordinates.
+
+    Parameters
+    ----------
+    extent : [float, float, float, float]
+        W, N, E, S, at 0.25 deg precision
+    data_path : Path
     """
 
     # get run date
