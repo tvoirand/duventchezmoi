@@ -120,7 +120,7 @@ def send_mail(
 
         # send message
         create_message = {"raw": encoded_message}
-        gmail_service = build("gmail", "v1", credentials=credentials)
+        gmail_service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
         send_message = (
             gmail_service.users().messages().send(userId="me", body=create_message).execute()
         )
