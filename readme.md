@@ -5,6 +5,8 @@ A tool to automatically alert me in case of strong winds in my town.
 Download GFS surface wind speed forecast around a given set of coordinates.
 Sends a report by email in case the forecast surpasses a given threshold.
 
+<img src="docs/example.png" width="50%"/>
+
 ## Dependencies
 
 *   Requires Python 3 with the following packages (listed in `environment.yml`):
