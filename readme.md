@@ -26,7 +26,9 @@ Sends a report by email in case the forecast surpasses a given threshold.
 
 *   Create a custom config file named `config/config.ini` based on the example given in `config/example_config.ini`
 
-*   Write a crontab to run `python duventchezmoi.py` periodically using the corresponding environment
+*   Install the duventchezmoi package using `pip install .`
+
+*   Write a crontab to run `python duventchezmoi/main.py` periodically using the corresponding environment
 
 ## Contribute
 

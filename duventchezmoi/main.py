@@ -18,9 +18,9 @@ import matplotlib.lines as mlines
 import matplotlib.dates as mdates
 
 # local modules
-from modules.download_gfs import download_gfs
-from modules.gmail_utils import authenticate_google_oauth2
-from modules.gmail_utils import send_mail
+from duventchezmoi.download_gfs import download_gfs
+from duventchezmoi.gmail_utils import authenticate_google_oauth2
+from duventchezmoi.gmail_utils import send_mail
 
 
 def send_report(
@@ -57,7 +57,7 @@ def send_report(
     contents += "See the report in attachment for more details.\n\n"
     contents += "This is an automatic email sent by the Duventchezmoi application."
 
-    project_path = Path(__file__).resolve().parent
+    project_path = Path(__file__).resolve().parents[1]
     credentials = authenticate_google_oauth2(
         project_path / "config" / "gmail_credentials.json",
         project_path / "config" / "gmail_token.json",
@@ -273,7 +273,7 @@ def duventchezmoi(config_path):
 
 if __name__ == "__main__":
 
-    project_path = Path(__file__).resolve().parent
+    project_path = Path(__file__).resolve().parents[1]
     config_path = project_path / "config" / "config.ini"
 
     duventchezmoi(config_path)
