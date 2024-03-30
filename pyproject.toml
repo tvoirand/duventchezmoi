@@ -1,0 +1,13 @@
+# CI configuration file to configure code standardization tools (such as black)
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
+force_single_line = true
+import_heading_future = "future"
+import_heading_stdlib = "standard library"
+import_heading_thirdparty = "third party"
+import_heading_firstparty = "current project"
+import_heading_localfolder = "local folder"

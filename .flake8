@@ -1,0 +1,7 @@
+# CI configuration file for flake8, a tool for code quality analysis
+
+[flake8]
+
+# ignored codes:
+# E501 line length, which is already enforced by black
+ignore = E501

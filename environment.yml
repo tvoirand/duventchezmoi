@@ -1,9 +1,17 @@
 name: duventchezmoi
+  - conda-forge
+  - defaults
 dependencies:
   - python=3.6
   - pygrib
   - numpy
   - matplotlib
+  - pytest
+  - black
+  - flake8
+  - isort
+  - pre-commit
+  - commitizen
   - pip
   - pip:
     - google-api-python-client
