@@ -2,16 +2,15 @@
 Script to plot duventchezmoi data archive.
 """
 
-# standard imports
-import os
-from pathlib import Path
+# standard library
 import argparse
 import configparser
 import datetime
+from pathlib import Path
 
-# local imports
-from duventchezmoi import write_report
+# current project
 from duventchezmoi import compute_mean_wind_speed
+from duventchezmoi import write_report
 
 
 def plot_archive(report_filename=None):
@@ -47,8 +46,6 @@ def plot_archive(report_filename=None):
 
             # compare value to threshold
             is_threshold_surpassed = wind_speed > threshold
-            if is_threshold_surpassed:  # trigger alert
-                is_alert_triggered = True
 
             # add item in data array
             data.append(

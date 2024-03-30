@@ -1,22 +1,21 @@
 """Module to send automatic emails with Gmail.
 """
 
-# standard imports
+# standard library
 import argparse
-from pathlib import Path
 import base64
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
 from email import encoders
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
 
-# third party imports
+# third party
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
 
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 
@@ -121,9 +120,7 @@ def send_mail(
         # send message
         create_message = {"raw": encoded_message}
         gmail_service = build("gmail", "v1", credentials=credentials, cache_discovery=False)
-        send_message = (
-            gmail_service.users().messages().send(userId="me", body=create_message).execute()
-        )
+        gmail_service.users().messages().send(userId="me", body=create_message).execute()
 
         if logger is not None:
             logger.info("Sent email with subject '{}' to {}".format(subject, recipients + cc + bcc))
@@ -131,7 +128,7 @@ def send_mail(
     except HttpError as error:
 
         if logger is not None:
-            logger.error("An error occurred when sending email: {error}")
+            logger.error(f"An error occurred when sending email: {error}")
 
 
 if __name__ == "__main__":

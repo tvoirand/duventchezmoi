@@ -2,9 +2,9 @@
 GFS data downloading module for Duventchezmoi.
 """
 
-# standard packages
-import urllib.request
+# standard library
 import datetime
+import urllib.request
 from pathlib import Path
 
 
@@ -66,7 +66,7 @@ def download_from_url(input_url, output_file, verbose=False):
 
     try:
         html = response.read()
-    except:
+    except Exception:
         exit("Error while downloading file")
 
     if len(html) > 0:

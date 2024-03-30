@@ -2,22 +2,22 @@
 Duventchezmoi main script.
 """
 
-# standard packages
-import sys
-import shutil
+# standard library
 import configparser
-import math
 import datetime
+import math
+import shutil
+import sys
 from pathlib import Path
 
-# third party packages
-import pygrib
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
+# third party
 import matplotlib.dates as mdates
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+import numpy as np
+import pygrib
 
-# local modules
+# current project
 from duventchezmoi.download_gfs import download_gfs
 from duventchezmoi.gmail_utils import authenticate_google_oauth2
 from duventchezmoi.gmail_utils import send_mail
@@ -98,7 +98,7 @@ def write_report(data, threshold, units, file_name=None):
             points_color.append("black")
 
     # creating figure
-    fig = plt.figure(figsize=[8.8, 4.8])
+    plt.figure(figsize=[8.8, 4.8])
     plt.scatter(dates, values, c=points_color, marker="+")  # plotting values
     plt.plot(
         dates,
@@ -221,7 +221,7 @@ def duventchezmoi(config_path):
     # download gfs data
     try:
         download_gfs(extent, todays_data_path)
-    except:
+    except Exception:
         sys.exit("Error in GFS data download")
 
     # loop through all hourly forecast gfs files
