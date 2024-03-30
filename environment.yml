@@ -1,4 +1,5 @@
 name: duventchezmoi
+channels:
   - conda-forge
   - defaults
 dependencies:
