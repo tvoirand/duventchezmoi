@@ -9,8 +9,8 @@ import datetime
 from pathlib import Path
 
 # current project
-from duventchezmoi import compute_mean_wind_speed
-from duventchezmoi import write_report
+from duventchezmoi.main import compute_mean_wind_speed
+from duventchezmoi.main import write_report
 
 
 def plot_archive(report_filename=None):
