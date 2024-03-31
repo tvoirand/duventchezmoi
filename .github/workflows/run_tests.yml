@@ -11,3 +11,4 @@ jobs:
           environment-file: environment.yml
       - name: Run tests with Pytest
         run: pytest
+        shell: micromamba-shell {0}
