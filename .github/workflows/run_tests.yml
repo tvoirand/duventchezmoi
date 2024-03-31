@@ -5,8 +5,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Mamba
-        uses: actions/setup-micromamba@v1
+      - name: Install dependencies with mamba
+        uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: environment.yml
       - name: Run tests with Pytest
