@@ -29,7 +29,7 @@ def plot_archive(report_filename=None):
     config = configparser.ConfigParser()
     config.read(project_path / "config" / "config.ini")
     threshold = float(config["main"]["threshold"])
-    data_path = config["main"]["data_path"]
+    data_path = Path(config["main"]["data_path"])
     units = config["main"]["units"]
 
     # initiate data array
