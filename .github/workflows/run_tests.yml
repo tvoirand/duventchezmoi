@@ -5,10 +5,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies with mamba
+      - name: Install external dependencies with mamba
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: environment.yml
+      - name: Install project's package with pip
+        run: pip install .
+        shell: micromamba-shell {0}
       - name: Run tests with Pytest
         run: pytest
         shell: micromamba-shell {0}
